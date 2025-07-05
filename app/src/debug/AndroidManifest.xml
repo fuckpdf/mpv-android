@@ -3,12 +3,14 @@
         <activity
             android:name=".IntentTestActivity"
             android:exported="false"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/FilePickerTheme" />
+            android:configChanges="orientation|screenSize|colorMode"
+            android:theme="@style/FilePickerTheme"
+            android:enableOnBackInvokedCallback="true" />
         <activity
             android:name=".CodecInfoActivity"
             android:exported="false"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/FilePickerTheme" />
+            android:configChanges="orientation|screenSize|colorMode"
+            android:theme="@style/FilePickerTheme"
+            android:enableOnBackInvokedCallback="true" />
     </application>
 </manifest>
