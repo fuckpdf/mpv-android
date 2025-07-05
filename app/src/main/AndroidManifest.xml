@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
     <uses-feature
@@ -10,9 +11,16 @@
         android:required="false" />
     <uses-feature android:glEsVersion="0x00020000" />
 
+    <!-- Uyumluluk için -->
+    <uses-sdk tools:overrideLibrary="is.xyz.mpv" />
+
+    <!-- İzinler -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
+        android:maxSdkVersion="28" />
 
     <application
         android:allowBackup="true"
@@ -196,7 +204,7 @@
             android:name=".FilePickerActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="behind"
-            android:theme="@style/FilePickerThemeSpecial"
+            <android:theme="@style/FilePickerThemeSpecial"
             android:exported="false" />
 
         <activity
