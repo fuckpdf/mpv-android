@@ -29,18 +29,31 @@ jobs:
           sudo apt-get install autoconf pkg-config libtool ninja-build python3-pip
           sudo pip3 install meson
 
-      # Android 15 uyumluluğu için SDK güncellemeleri
+      # ✅ DÜZELTME 1: Android 15 uyumlu SDK kurulumu
       - name: Setup Android SDK for Android 15
         run: |
           # Android SDK 35 (Android 15) kurulumu
           echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35"
-          echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;35.0.0"
-          echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;26.1.10909125"
+          echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0"
+          echo y | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.0.12077973"
           
           # Çevre değişkenlerini ayarla
           echo "ANDROID_COMPILE_SDK=35" >> $GITHUB_ENV
           echo "ANDROID_TARGET_SDK=35" >> $GITHUB_ENV
           echo "ANDROID_MIN_SDK=21" >> $GITHUB_ENV
+          echo "ANDROID_NDK_VERSION=27.0.12077973" >> $GITHUB_ENV
+
+      # ✅ DÜZELTME 2: Gradle properties'i önceden ayarla
+      - name: Configure Gradle Properties
+        run: |
+          cat >> gradle.properties << EOF
+          android.compileSdk=35
+          android.targetSdk=35
+          android.buildTools=34.0.0
+          android.useAndroidX=true
+          android.enableJetifier=true
+          org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=512m
+          EOF
 
       - name: Download deps
         run: |
@@ -50,18 +63,14 @@ jobs:
           CACHE_MODE: "folder"
           CACHE_FOLDER: "${{ github.workspace }}/gh-cache"
 
-      # Android 15 uyumlu build
+      # ✅ DÜZELTME 3: Temiz build süreci
       - name: Build with Android 15 support
         run: |
-          # Gradle özelliklerini Android 15 için ayarla
-          echo "android.compileSdk=35" >> gradle.properties
-          echo "android.targetSdk=35" >> gradle.properties
-          echo "android.buildTools=35.0.0" >> gradle.properties
-          
           buildscripts/include/ci.sh build
         env:
           ANDROID_COMPILE_SDK: 35
           ANDROID_TARGET_SDK: 35
+          ANDROID_NDK_VERSION: 27.0.12077973
 
       # Universal APK (tüm mimarileri içeren) - Android 15 uyumlu
       - uses: actions/upload-artifact@v4
@@ -96,11 +105,14 @@ jobs:
           name: mpv-android-x86_64-android15
           path: app/build/outputs/apk/default/debug/app-default-x86_64-debug.apk
 
-      # Release APK'ları da oluştur
+      # ✅ DÜZELTME 4: Release build'i daha güvenilir hale getir
       - name: Build Release APKs
         run: |
-          buildscripts/include/ci.sh build --release
+          ./gradlew assembleDefaultRelease
         continue-on-error: true
+        env:
+          ANDROID_COMPILE_SDK: 35
+          ANDROID_TARGET_SDK: 35
 
       - uses: actions/upload-artifact@v4
         with:
