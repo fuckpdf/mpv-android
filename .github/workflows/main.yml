@@ -1,0 +1,50 @@
+name: Build and Conditional Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # ... mevcut build adımlarınız ...
+    
+    # Her zaman artifact upload et
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: mpv-android-${{ github.run_number }}
+        path: |
+          app/build/outputs/apk/**/*.apk
+          app/build/outputs/mapping/*/mapping.txt
+        retention-days: 30
+    
+    # Sadece main branch'e push olduğunda release yap
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: "build-${{ github.run_number }}"
+        name: "MPV Android Build #${{ github.run_number }}"
+        body: |
+          🔥 **Latest Build**
+          
+          **Commit**: [`${{ github.sha }}`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+          **Author**: ${{ github.actor }}
+          **Date**: ${{ github.event.head_commit.timestamp }}
+          
+          ## 📋 Changes:
+          ${{ github.event.head_commit.message }}
+          
+          ## 📱 Downloads:
+          - Release APK (recommended)
+          - Debug APK (for testing)
+        files: app/build/outputs/apk/**/*.apk
+        draft: false
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
