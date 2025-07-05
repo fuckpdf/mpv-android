@@ -6,11 +6,11 @@ ext.universalBase = 8000
 
 android {
     namespace 'is.xyz.mpv'
-    compileSdk 34                    // ✅ 35 → 34 değişti
+    compileSdk 35                    // ✅ 34 → 35 değiştir
 
     defaultConfig {
         minSdkVersion 21
-        targetSdk 30                 // ✅ 35 → 30 değişti
+        targetSdkVersion 35          // ✅ targetSdk → targetSdkVersion ve 30 → 35
 
         versionCode 41
         versionName "2025-04-21-release"
@@ -22,7 +22,7 @@ android {
     productFlavors {
         "default" {
             isDefault true
-            targetSdkVersion 30      // ✅ Yeni eklendi
+            targetSdkVersion 35      // ✅ 30 → 35 değiştir
         }
         api29 {
             targetSdkVersion 29
